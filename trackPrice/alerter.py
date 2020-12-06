@@ -1,10 +1,11 @@
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib
+import os
 
 
 class alerter:
-    def __init__(self, sender=None, email_address="calisteniadoskilos@gmail.com", email_password="c4l1st3n14d0sk1l0s", smtp_address="smtp.gmail.com", smtp_port=587):
+    def __init__(self, sender=None, email_address=os.environ.get("ALERTER_EMAIL_ADDRESS"), email_password=os.environ.get("ALERTER_EMAIL_PASSWORD"), smtp_address="smtp.gmail.com", smtp_port=587):
         if sender:
             self.sender = sender
         else:
