@@ -28,12 +28,16 @@ class priceTracker():
         while (now-then) < extension.total_seconds():
             new_price = self.get_price(webdriver, site_url, price_class_name)
             if last_price > new_price:
-                print(f"PRICE WENT DOWN: {new_price}")
+                self.alert(f"PRICE WENT DOWN: {new_price}")
             else:
-                print(f"Nah, just the same (or worse): {new_price}")
+                self.alert(f"Nah, just the same (or worse): {new_price}")
             last_price = new_price
             now = time.time()
-        print("I'M DONE")
+        self.alert("I'M DONE")
+
+    def alert(self, message, type="INFO"):
+        print(message)
+        return True
 
 
 if __name__ == "__main__":
