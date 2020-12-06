@@ -1,13 +1,16 @@
 from trackPrice.sneakerBot import priceTracker
+from trackPrice.alerter import alerter
+from datetime import timedelta
 
 
 def main():
     # guitar_url = "https://www.bestbuy.com.mx/p/fender-guitarra-clasica-fa-125-cafe/1000222806"
     telecaster_url = "https://www.bestbuy.com.mx/p/fender-guitarra-electrica-affinity-series-telecaster-gris/1000230729"
     best_buy_price_div_class_name = "product-price"
+    best_buy_alerter = alerter()
     best_buy_tracker = priceTracker(
-        telecaster_url, best_buy_price_div_class_name)
-    best_buy_tracker.track_price()
+        telecaster_url, best_buy_price_div_class_name, best_buy_alerter)
+    best_buy_tracker.track_price(extension=timedelta(seconds=5))
 
 
 if __name__ == "__main__":
