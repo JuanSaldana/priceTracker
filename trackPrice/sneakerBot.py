@@ -60,6 +60,9 @@ class priceTracker():
         last_prices = [self.get_price(
             webdriver, tag.url, tag.div_tag) for tag in tags]
         while (now-then) < extension.total_seconds():
+            if now-then > timedelta(hours=6).total_seconds():
+                self.alert(
+                    alert_message="SneakerBot reporting is still working", alert_type="REPORT")
             new_prices = []
             for last_price, tag in zip(last_prices, tags):
                 new_price = self.get_price(
