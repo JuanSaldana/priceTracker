@@ -1,8 +1,10 @@
 from selenium import webdriver as webDriver
 from price_parser import Price
 from trackPrice.price_tag import priceTag
+from trackPrice.alerter import alerter
 import time
 from datetime import timedelta
+from pydash import get as _get
 
 
 class priceTracker():
@@ -38,12 +40,45 @@ class priceTracker():
         while (now-then) < extension.total_seconds():
             new_price = self.get_price(webdriver, site_url, price_class_name)
             if last_price > new_price:
-                self.alert(f"PRICE WENT DOWN: {new_price}", "PRICE WENT DOWN")
+                self.alert(
+                    f"PRICE WENT DOWN FOR {price_name}: {new_price}\n go get it in: {site_url}", f"PRICE WENT DOWN for: {price_name}", times=10)
             else:
-                self.alert(f"Nah, just the same (or worse): {new_price}")
+                self.alert(
+                    f"Nah, just the same (or worse): {new_price}", "INFO")
             last_price = new_price
             now = time.time()
-        self.alert("I'M DONE", "FINISHED")
+        self.alert(alert_message="I'M DONE, REDEPLOY OR NAH",
+                   alert_type="FINISHED")
 
-    def alert(self, alert_message="PriceTracker Here, reporting", alert_type="INFO"):
-        return self.alerter.alert(alert_message, alert_type)
+    def track_prices(self, price_names, extension: timedelta = timedelta(minutes=1)):
+        then = time.time()
+        now = time.time()
+        webdriver = self.webdriver
+        # get tags
+        tags = [self.get_tag_by_name(name) for name in price_names]
+        tags = list(filter(None, tags))
+        last_prices = [self.get_price(
+            webdriver, tag.url, tag.div_tag) for tag in tags]
+        while (now-then) < extension.total_seconds():
+            new_prices = []
+            for last_price, tag in zip(last_prices, tags):
+                new_price = self.get_price(
+                    webdriver, tag.url, tag.div_tag)
+                if last_price > new_price:
+                    print("PRICE WENT DOWN")
+                    self.alert(
+                        f"PRICE WENT DOWN for {tag.name}: {new_price}\n go get it: {tag.url}", f"PRICE WENT DOWN: {tag.name}", times=10)
+                else:
+                    self.alert(f"Nah, just the same (or worse)", "INFO")
+                new_prices.append(new_price)
+            last_prices = new_prices
+            now = time.time()
+        self.alert(alert_message="I'M DONE, REDEPLOY OR NAH",
+                   alert_type="FINISHED")
+
+    def alert(self, alert_message="PriceTracker Here, reporting", alert_type="INFO", destination="jasaldanah@gmail.com", times: int = 1):
+        if alert_type == "INFO":
+            print(alert_type+": "+alert_message)
+        else:
+            self.alerter.alert(alert_message, alert_type,
+                               times=times, destination=destination)
