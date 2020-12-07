@@ -34,7 +34,14 @@ class alerter:
             successful = self.sender.send_message(msg)
         return successful
 
-    def alert(self, message_text="This is an alerter test", alert_type="TEST"):
-        msg = self.build_message(message_text, alert_type)
-        successful = self.send_email(msg)
+    def alert(self, message_text="This is an alerter test", alert_type="TEST", destination="jasaldanah@gmail.com", times: int = 1):
+        if times > 1:
+            successful = True
+            for i in range(times):
+                msg = self.build_message(message_text, alert_type)
+                success = self.send_email(msg, destination=destination)
+                successful = successful and success
+        else:
+            msg = self.build_message(message_text, alert_type)
+            successful = self.send_email(msg, destination=destination)
         return successful
