@@ -1,14 +1,14 @@
 from selenium import webdriver as webDriver
 from price_parser import Price
+from trackPrice.price_tag import priceTag
 import time
 from datetime import timedelta
 
 
 class priceTracker():
-    def __init__(self, url, price_div_class_name, alerter):
-        self.site_url = url
+    def __init__(self, alerter: alerter, price_tags: priceTag):
         self.webdriver = webDriver.Chrome("./chromedriver")
-        self.price_div_class_name = price_div_class_name
+        self.price_tags = price_tags
         self.alerter = alerter
 
     @staticmethod
@@ -19,12 +19,21 @@ class priceTracker():
         precio = Price.fromstring(price_div.get_attribute("innerHTML"))
         return precio.amount_float
 
-    def track_price(self, extension: timedelta = timedelta(minutes=1)):
+    def get_tag_by_name(self, price_name) -> priceTag:
+        tag = next((tag for tag in self.price_tags if tag.name ==
+                    price_name), "NOT FOUND")
+        if tag == "NOT FOUND":
+            raise(Exception("TAG NOT FOUND"))
+        elif tag:
+            return tag
+
+    def track_price(self, price_name, extension: timedelta = timedelta(minutes=1)):
         then = time.time()
         now = time.time()
+        price_tag = self.get_tag_by_name(price_name)
+        site_url = price_tag.url
+        price_class_name = price_tag.div_tag
         webdriver = self.webdriver
-        site_url = self.site_url
-        price_class_name = self.price_div_class_name
         last_price = self.get_price(webdriver, site_url, price_class_name)
         while (now-then) < extension.total_seconds():
             new_price = self.get_price(webdriver, site_url, price_class_name)
