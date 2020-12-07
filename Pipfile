@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 selenium = "*"
 price-parser = "*"
+pydash = "*"
 
 [requires]
 python_version = "3.7"
