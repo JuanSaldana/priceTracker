@@ -72,7 +72,8 @@ class priceTracker():
                     self.alert(
                         f"PRICE WENT DOWN for {tag.name}: {new_price}\n go get it: {tag.url}", f"PRICE WENT DOWN: {tag.name}", times=10)
                 else:
-                    self.alert(f"Nah, just the same (or worse)", "INFO")
+                    self.alert(
+                        f"Nah, just the same (or worse) for {tag.name}: {new_price}", "INFO")
                 new_prices.append(new_price)
             last_prices = new_prices
             now = time.time()
